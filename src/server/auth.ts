@@ -5,6 +5,7 @@ import {
   type DefaultSession,
 } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
@@ -41,16 +42,19 @@ export const authOptions: NextAuthOptions = {
       ...session,
       user: {
         ...session.user,
-        id: user.id,
+        id: user?.id,
       },
     }),
   },
+  session: {
+    strategy: "jwt", // necessary for CredentialsProvider
+  },
   adapter: PrismaAdapter(prisma),
   providers: [
-    DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
-    }),
+    // DiscordProvider({
+    //   clientId: env.DISCORD_CLIENT_ID,
+    //   clientSecret: env.DISCORD_CLIENT_SECRET,
+    // }),
     /**
      * ...add more providers here.
      *
@@ -60,6 +64,39 @@ export const authOptions: NextAuthOptions = {
      *
      * @see https://next-auth.js.org/providers/github
      */
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        username: { label: "Username", type: "text" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials, req) {
+        // Add logic here to look up the user from the credentials supplied
+        // If you return null or false then the credentials will be rejected
+        
+        // console.log("credentials", credentials);
+
+        if (credentials?.username !== env.ADMIN_USERNAME) return null;
+        if (credentials?.password !== env.ADMIN_PASSWORD) return null;
+
+        // console.log("credentials valid");
+
+        // const adminUser = await prisma.user.findUniqueOrThrow({
+        //   where: {
+        //     email: env.ADMIN_USERNAME,
+        //   },
+        //   select: {
+        //     id: true,
+        //     name: true,
+        //     email: true,
+        //   }
+        // });
+        
+        // console.log("adminUser", adminUser);
+
+        return { id: "admin", name: "Admin", email: env.ADMIN_USERNAME };
+      },
+    }),
   ],
 };
 
