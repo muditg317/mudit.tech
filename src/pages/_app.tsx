@@ -6,13 +6,17 @@ import { api } from "~/utils/api";
 
 import "~/styles/globals.css";
 
+import PageWrapper from "~/components/PageWrapper";
+
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
   return (
     <SessionProvider session={session}>
-      <Component {...pageProps} />
+      <PageWrapper>
+        <Component {...pageProps} />
+      </PageWrapper>
     </SessionProvider>
   );
 };
