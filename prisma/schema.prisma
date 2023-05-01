@@ -71,4 +71,6 @@ model Redirection {
     title     String
     target    String
     aliases   String // || delimited (with start and end delimiters)
+
+    @@unique([title])
 }
