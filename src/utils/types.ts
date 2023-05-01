@@ -2,10 +2,11 @@
 export type ElementOf<T> = T extends (infer E)[] ? E : T extends readonly (infer E)[] ? E : T extends ArrayLike<infer E> ? E : never;
 
 /** Used internally for `Tail`. */
-type AsFunctionWithArgsOf<T extends unknown[] | readonly unknown[]> = (...args: T) => any;
+type AsFunctionWithArgsOf<T extends unknown[] | readonly unknown[]> = (...args: T) => unknown;
 
 /** Used internally for `Tail` */
-type TailArgs<T> = T extends (x: any, ...args: infer T) => any ? T : never;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type TailArgs<T> = T extends (x: any, ...args: infer Rest) => unknown ? Rest : never;
 
 /** Elements of an array after the first. */
 export type Tail<T extends unknown[] | readonly unknown[]> = TailArgs<AsFunctionWithArgsOf<T>>;
@@ -17,7 +18,7 @@ type AsDescendingLengths<T extends unknown[] | readonly unknown[]> =
 
 /** Used to get index of an array as a string */
 export type StrIndicesOf<A> = Exclude<keyof A, keyof []>;
-type indexStrToNum = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49];
+// type indexStrToNum = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49];
 // type SmartIndexOf<T extends readonly unknown[]> = indexStrToNum[StrIndicesOf<T>];
 
 /** Union of numerical literals corresponding to a tuple's possible indices */
@@ -30,17 +31,17 @@ export type IndicesOf<T extends ArrayLike<unknown>> =
     keyof T; // cannot get actual indices -> any key of T
 
 /** Used internally by AsReadonlyArr - get keys excluding indices and length */
-type ReadonlyArrayMethods = Omit<readonly any[], number|'length'>;
+type ReadonlyArrayMethods = Omit<readonly unknown[], number|'length'>;
 
 /** Convert a record of number to item to a readonly array of those items */
 export type AsReadonlyArr<Items extends Record<number, unknown>, Length> = Items & ReadonlyArrayMethods & {length: Length};
     
 /** Extract keys from each option in a union type */
-export type AllUnionMemberKeys<T> = T extends any ? keyof T : never;
+export type AllUnionMemberKeys<T> = T extends unknown ? keyof T : never;
 
 /** Convert union to intersection type */
 export type UnionToIntersection<T> = 
-    (T extends any ? (x: T) => void : never) extends 
+    (T extends unknown ? (x: T) => void : never) extends 
     (x: infer R) => void ? R : never;
 
 /** Used internally for TuplifyUnion - gets last entry in union
@@ -48,12 +49,12 @@ export type UnionToIntersection<T> =
  */
 type LastOf<T> =
     UnionToIntersection<
-        T extends any ? () => T : never
+        T extends unknown ? () => T : never
     > extends
     () => infer R ? R : never;
 
 /** Used internally for TuplifyUnion - adds type V to list of types T */
-type Push<T extends any[], V> = [V, ...T];
+type Push<T extends Array<unknown>, V> = [V, ...T];
 
 /** Used internally for TuplifyUnion - adds necessary generic params */
 type TuplifyUnionHelper<
@@ -72,10 +73,10 @@ type TuplifyUnionHelper<
 export type TuplifyUnion<T> = TuplifyUnionHelper<T>;
 
 /** Get all value types from object type - (key,value) pairs */
-export type ValueOf<T extends Record<any, unknown>> = T extends Record<infer K, unknown> ? T[K] : never;
+export type ValueOf<T extends Record<string|number|symbol, unknown>> = T extends Record<infer K, unknown> ? T[K] : never;
 
 /** Used internally for Permutations - removes the first instance of `T` from `A`. */
-type ExcludeElement<A extends readonly any[], T extends any> =
+type ExcludeElement<A extends ReadonlyArray<unknown>, T> =
     A extends readonly [infer H, ...infer R]
         ? H extends T ? T extends H
             ? R // we've found T; just return what's left

@@ -1,6 +1,6 @@
 import type {ElementOf, TuplifyUnion} from '~/utils/types';
 import {arrayAsReadonly} from '~/utils/type-modifiers';
-import { EmptyString, GetAliases, MultiWord, typeCheckFn, UrlEntry } from './types';
+import type { EmptyString, GetAliases, MultiWord, UrlEntry, ValidatedList } from './types';
 import { EntryType } from './types';
 
 export type InvalidRedirectAlias = MultiWord|EmptyString;
@@ -71,7 +71,8 @@ export const REDIRECTS = [
     entryType: EntryType.Redirect,
   }),
 ] as const;
-typeCheckFn<typeof REDIRECTS, Redirect, InvalidRedirectAlias>(REDIRECTS);
+REDIRECTS satisfies ValidatedList<typeof REDIRECTS, Redirect, InvalidRedirectAlias>;
+// typeCheckFn<typeof REDIRECTS, Redirect, InvalidRedirectAlias>(REDIRECTS);
 
 export type ConstRedirects = typeof REDIRECTS;
 export type RedirectConst = ElementOf<ConstRedirects>;
@@ -88,7 +89,7 @@ export function where<F extends keyof RedirectConst, V extends RedirectConst[F]>
   function filterFunc(redir: RedirectConst): redir is FilteredRedirect {
     return redir[flagName] === value;
   }
-  return REDIRECTS.find(filterFunc)!;
+  return REDIRECTS.find(filterFunc);
 }
 
 export type AllSources = GetAliases<typeof REDIRECTS>;

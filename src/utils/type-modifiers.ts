@@ -1,3 +1,3 @@
-export function arrayAsReadonly<T extends any[]>(array: T): Readonly<T> {
+export function arrayAsReadonly<T>(array: Array<T>): ReadonlyArray<T> {
   return array;
 }

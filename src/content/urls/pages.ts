@@ -1,7 +1,7 @@
-import {ElementOf, TuplifyUnion} from '~/utils/types';
+import type {ElementOf, TuplifyUnion} from '~/utils/types';
 import {arrayAsReadonly} from '~/utils/type-modifiers';
-import type { GetAliases, MultiWord, UrlEntry } from './types';
-import {EntryType, typeCheckFn} from './types';
+import type { GetAliases, MultiWord, UrlEntry, ValidatedList } from './types';
+import {EntryType} from './types';
 
 export type InvalidPageAlias = MultiWord;
 
@@ -60,7 +60,8 @@ export const PAGES = [
     entryType: EntryType.Page,
   },
 ] as const satisfies ReadonlyArray<Page>;
-typeCheckFn<typeof PAGES, Page, InvalidPageAlias>(PAGES);
+PAGES satisfies ValidatedList<typeof PAGES, Page, InvalidPageAlias>;
+// typeCheckFn<typeof PAGES, Page, InvalidPageAlias>(PAGES);
 
 export type ConstPages = typeof PAGES;
 export type PageConst = ElementOf<ConstPages>;
@@ -77,7 +78,7 @@ export function where<F extends keyof PageConst, V extends PageConst[F]>(flagNam
   function filterFunc(page: PageConst): page is FilteredPage {
     return page[flagName] === value;
   }
-  return PAGES.find(filterFunc)!;
+  return PAGES.find(filterFunc);
 }
 
 export type AllSources = GetAliases<typeof PAGES>;

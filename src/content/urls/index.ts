@@ -3,16 +3,18 @@ import type {InvalidPageAlias,     Page,     PageConst    } from "./pages";
 import type {InvalidRedirectAlias, Redirect, RedirectConst} from './redirects';
 import {PAGES,     excluding as pagesExcluding,     where as pageWhere    } from "./pages";
 import {REDIRECTS, excluding as redirectsExcluding, where as redirectWhere} from "./redirects";
-import {EntryTypeUnion, GetTitles, } from "./types";
-import {typeCheckFn} from "./types";
+import type {EntryTypeUnion, GetTitles, ValidatedList} from "./types";
+// import {typeCheckFn} from "./types";
 import { arrayAsReadonly } from "~/utils/type-modifiers";
-import type { TuplifyUnion, ElementOf, AsReadonlyArr, IndicesOf, Permutations } from "~/utils/types";
+import type { TuplifyUnion, ElementOf, Permutations } from "~/utils/types";
 
 export {isEntryType} from './types';
 
 export {redirectsExcluding, pagesExcluding};
 const allEntries = [...PAGES, ...REDIRECTS] as const;
-typeCheckFn<typeof allEntries, EntryTypeUnion, InvalidRedirectAlias&InvalidPageAlias>(allEntries);
+allEntries satisfies ValidatedList<typeof allEntries, EntryTypeUnion, InvalidRedirectAlias&InvalidPageAlias>;
+// typeCheckFn<typeof allEntries, EntryTypeUnion, InvalidRedirectAlias&InvalidPageAlias>(allEntries);
+
 export {PAGES, REDIRECTS};
 export {pageWhere, redirectWhere};
 
@@ -49,9 +51,9 @@ export function withAlias<Const extends EntryTypeUnion, A extends string, L exte
   type AliasesType = Permutations<readonly [A, ...stringArr]>;
   type FilteredEntry = Extract<Const, {readonly aliases: AliasesType}>;
   function filterFunc(entry: Const): entry is FilteredEntry {
-    return (entry.aliases as ReadonlyArray<string>).includes(alias);
+    return (entry.aliases).includes(alias);
   }
-  return entries.find(filterFunc)!;
+  return entries.find(filterFunc);
 }
 export function pageWithAlias<A extends string>(alias: A) {
   return withAlias<PageConst, A>(PAGES, alias);
@@ -64,7 +66,8 @@ export const navPages = filteredPages("showOnNavBar", true);
 export const navRedirects = filteredRedirects("showOnNavBar", true);
 export const navEntries = [...navPages, ...navRedirects] as const;
 
-const redirectHub = pageWhere('title', 'Redirect Hub');
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+const redirectHub = pageWhere('title', 'Redirect Hub')!;
 export const Page_RedirectHub = {
   ...redirectHub,
   pathname: redirectHub.aliases[0],
