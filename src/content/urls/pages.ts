@@ -1,5 +1,4 @@
 import type {ElementOf, TuplifyUnion} from '~/utils/types';
-import {arrayAsReadonly} from '~/utils/type-modifiers';
 import type { GetAliases, MultiWord, UrlEntry, ValidatedList } from './types';
 import {EntryType} from './types';
 
@@ -32,15 +31,15 @@ export const PAGES = [
     description: "You've reached the redirect hub. There's probably a broken link somewhere...",
     entryType: EntryType.Page,
   },
-  {
-    aliases: ['projects'],
-    title: "Projects",
-    showOnNavBar: true,
-    isMainPage: false,
-    isMinorPage: false,
-    description: "Mudit Gupta's projects",
-    entryType: EntryType.Page,
-  },
+  // {
+  //   aliases: ['projects'],
+  //   title: "Projects",
+  //   showOnNavBar: true,
+  //   isMainPage: false,
+  //   isMinorPage: false,
+  //   description: "Mudit Gupta's projects",
+  //   entryType: EntryType.Page,
+  // },
   {
     aliases: ['blog'],
     title: "Blog?",
@@ -65,20 +64,20 @@ PAGES satisfies ValidatedList<typeof PAGES, Page, InvalidPageAlias>;
 
 export type ConstPages = typeof PAGES;
 export type PageConst = ElementOf<ConstPages>;
-export function excluding<F extends keyof PageConst, V extends PageConst[F]|undefined>(flagName: F, value: V) {
+export function excluding<F extends keyof PageConst, V extends PageConst[F]>(flagName: F, value: V) {
   type FilteredPage = Exclude<PageConst, {[K in F]: V}>;
   function filterFunc(page: PageConst): page is FilteredPage {
     return page[flagName] !== value;
   }
   const filteredPages = PAGES.filter(filterFunc);
-  return arrayAsReadonly(filteredPages as TuplifyUnion<ElementOf<typeof filteredPages>>);
+  return filteredPages as Readonly<TuplifyUnion<FilteredPage>>;
+  // return arrayAsReadonly(filteredPages as TuplifyUnion<ElementOf<typeof filteredPages>>);
 }
 export function where<F extends keyof PageConst, V extends PageConst[F]>(flagName: F, value: V) {
   type FilteredPage = Extract<PageConst, {[K in F]: V}>;
   function filterFunc(page: PageConst): page is FilteredPage {
     return page[flagName] === value;
   }
-  return PAGES.find(filterFunc);
+  return PAGES.find(filterFunc) as TuplifyUnion<FilteredPage>[0];
 }
-
 export type AllSources = GetAliases<typeof PAGES>;

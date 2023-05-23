@@ -1,5 +1,4 @@
 import type {ElementOf, TuplifyUnion} from '~/utils/types';
-import {arrayAsReadonly} from '~/utils/type-modifiers';
 import type { EmptyString, GetAliases, MultiWord, UrlEntry, ValidatedList } from './types';
 import { EntryType } from './types';
 
@@ -82,14 +81,15 @@ export function excluding<F extends keyof RedirectConst, V extends RedirectConst
     return redir[flagName] !== value;
   }
   const filteredRedirects = REDIRECTS.filter(filterFunc);
-  return arrayAsReadonly(filteredRedirects as TuplifyUnion<ElementOf<typeof filteredRedirects>>);
+  return filteredRedirects as Readonly<TuplifyUnion<FilteredRedirect>>;
+  // return arrayAsReadonly(filteredRedirects as TuplifyUnion<ElementOf<typeof filteredRedirects>>);
 }
 export function where<F extends keyof RedirectConst, V extends RedirectConst[F]>(flagName: F, value: V) {
   type FilteredRedirect = Extract<RedirectConst, {[K in F]: V}>;
   function filterFunc(redir: RedirectConst): redir is FilteredRedirect {
     return redir[flagName] === value;
   }
-  return REDIRECTS.find(filterFunc);
+  return REDIRECTS.find(filterFunc) as TuplifyUnion<FilteredRedirect>[0];
 }
 
 export type AllSources = GetAliases<typeof REDIRECTS>;

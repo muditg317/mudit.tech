@@ -54,7 +54,7 @@ type LastOf<T> =
     () => infer R ? R : never;
 
 /** Used internally for TuplifyUnion - adds type V to list of types T */
-type Push<T extends Array<unknown>, V> = [V, ...T];
+type Push<T extends Array<unknown>, V> = [...T, V];
 
 /** Used internally for TuplifyUnion - adds necessary generic params */
 type TuplifyUnionHelper<
@@ -90,3 +90,23 @@ export type Permutations<T extends readonly unknown[]> =
             // put each member of T first in an array, and concatenate the permutations of T without that member
             [K in keyof T]: readonly [T[K], ...Permutations<ExcludeElement<T, T[K]>>]
         }[keyof T & number]; // get the union of all permutations starting with each element of T
+
+/** Used internally for ArrayOf */
+type BuildArrayOf<
+    Quantifier extends 'exactly' | 'at least',
+    Count extends number,
+    Type,
+    Current extends Type[]
+    > = Current['length'] extends Count
+    ? Quantifier extends 'exactly'
+    ? [...Current]
+    : [...Current, ...Type[]]
+    : BuildArrayOf<Quantifier, Count, Type, [...Current, Type]>;
+
+/** An array of a given type comprised of either exactly or at least a certain count of that type. */
+export type ArrayOf<Quantifier extends 'exactly' | 'at least', Count extends number, Type> = BuildArrayOf<
+    Quantifier,
+    Count,
+    Type,
+    []
+>;

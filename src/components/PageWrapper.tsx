@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 // import Header from "./Header";
 import Footer from "./Footer";
 
@@ -19,46 +19,22 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
 
   const onMainPage = page?.isMainPage ?? false;
 
-  // useEffect(() => {
-  //   if (!onMainPage) {
-  //     return;
-  //   }
-  //   const observer = new IntersectionObserver((entries) => {
-  //     entries.forEach((entry) => {
-  //       const tabName = entry.target.getAttribute("data-nav-tab");
-  //       console.log(tabName, entry.isIntersecting);
-  //       if (tabName != null && entry.isIntersecting) {
-  //         setActiveTab(tabName);
-  //       }
-  //     });
-  //   }, { rootMargin: "-50% 0px -50% 0px" });
-  //   // (window as any).sat = setActiveTab;
-  //   // (window as any).observer = observer;
-
-  //   const navTabSections = document.querySelectorAll("[data-nav-tab]");
-  //   console.log(navTabSections);
-
-  //   navTabSections.forEach((section) => {
-  //     observer.observe(section);
-  //   });
-
-  //   return () => {
-  //     observer.disconnect();
-  //   }
-  // }, [onMainPage]);
+  const navbar = useMemo(() => {
+    return <NavBar<PageConst>
+      entries={[
+        MAIN_PAGE,
+        ...navPages
+      ] as const}
+      isActiveTab={(entry: PageConst) => readonlyIncludes(entry.aliases, activeTab)}
+      onTabClick={(entry: PageConst) => void router.push(`/${entry.aliases[0]}`)}
+    />
+  }, [activeTab, router]);
 
   if (!page) {
     return <>
       {children}
     </>
   }
-
-
-  // if (page.isMainPage) {
-  //   return <>
-  //     {children}
-  //   </>
-  // }
 
   return (<>
     <Head>
@@ -78,15 +54,7 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
       {/* <Palette /> used for KBar */}
       <header className="">
         <nav className="w-[6%] fixed left-0 h-full z-50 hidden lg:block md:block">
-          <NavBar<PageConst>
-              activeTab={activeTab}
-              entries={[
-                MAIN_PAGE,
-                ...navPages
-              ] as const}
-              isActiveTab={(entry: PageConst) => readonlyIncludes(entry.aliases, activeTab)}
-              onTabClick={(entry: PageConst) => void router.push(entry.aliases[0])}
-            />
+          { navbar }
         </nav>
         <nav className="fixed top-0 w-full z-50 block lg:hidden md:hidden px-8 pt-4">
           {/* <MobileNavBar path={currentRoute} /> */}

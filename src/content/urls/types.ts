@@ -1,4 +1,4 @@
-import type { ElementOf, IndicesOf, ValueOf } from "~/utils/types";
+import type { ArrayOf, ElementOf, IndicesOf, ValueOf } from "~/utils/types";
 import type { Page } from "./pages";
 import type { Redirect } from "./redirects";
 
@@ -26,7 +26,7 @@ export function isEntryType<EnumType extends EntryType, T extends EntryTypeMap[E
 }
 
 type BaseUrlEntry = {
-  aliases: readonly string[];
+  aliases: Readonly<ArrayOf<'at least', 1, string>>;
   title: CapitalizedString;
   showOnNavBar: boolean;
   entryType: EntryType;

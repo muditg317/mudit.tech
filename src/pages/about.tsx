@@ -1,4 +1,4 @@
-import { GetServerSideProps, type NextPage } from "next";
+import { type NextPage } from "next";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { MAIN_PAGE, filteredPages, navPages } from "~/content/urls";
@@ -14,7 +14,7 @@ const PROJECTS = [
   }
 ] as const;
 
-const Home: NextPage = () => {
+const About: NextPage = () => {
   const hello = api.example.hello.useQuery({ text: "from tRPC" });
 
   return (
@@ -22,7 +22,7 @@ const Home: NextPage = () => {
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
           <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem] my-12">
-            Mudit Gupta
+            About
           </h1>
           <div className="flex flex-col items-center gap-2">
             <p className="text-2xl text-white">
@@ -54,7 +54,7 @@ const Home: NextPage = () => {
   );
 };
 
-export default Home;
+export default About;
 
 const AuthShowcase: React.FC = () => {
   const { data: sessionData } = useSession();
@@ -79,18 +79,3 @@ const AuthShowcase: React.FC = () => {
     </div>
   );
 };
-
-
-// export const getServerSideProps: GetServerSideProps = async (context) => {
-//   console.log(context.req.headers.referer);
-//   // const hello = await api.example.hello.fetchQuery({ text: "from getServerSideProps" });
-
-//   // return {
-//   //   props: {
-//   //     hello,
-//   //   },
-//   // };
-//   return {
-//     props: {},
-//   };
-// };
