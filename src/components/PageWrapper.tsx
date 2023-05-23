@@ -13,12 +13,11 @@ type PageWrapperProps = {
 };
 const PageWrapper = ({ children }: PageWrapperProps) => {
   const [router, currentRoute, page] = useRouterWithPage();
-  const [activeTab, setActiveTab] = useState<string>(currentRoute);
-  // const activeTab = currentRoute;
-  useEffect(() => {
-    setActiveTab(currentRoute);
-  }, [currentRoute]);
-  // (window as any).sat = setActiveTab;
+  // const [activeTab, setActiveTab] = useState<string>(currentRoute);
+  // useEffect(() => {
+  //   setActiveTab(currentRoute);
+  // }, [currentRoute]);
+  const activeTab = currentRoute;
 
   const navbar = useMemo(() => {
     return <NavBar<PageConst>
@@ -41,7 +40,6 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
     <Head>
       <title key='title'>{page.isMainPage ? page.title : `${MAIN_PAGE?.title} - ${page.title}`}</title>
       <meta key='desc' name="description" content="Mudit Gupta website" />
-      {/* <link rel="icon" href="/favicon.ico" /> */}
       <link key='icon-svg' rel="icon" href="favicon.svg"
         type="image/svg+xml" />
       <link key='ico-light' rel="icon" href="favicon-light.ico"
@@ -63,13 +61,6 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
       </header>
       <main className="w-full min-h-screen h-full flex flex-col items-center relative">
         <section className="flex flex-col w-full justify-between mt-16 lg:mt-0 md:mt-0 prose">
-          {/* <Header /> -- only for main page */}
-          {/* {!page.isMainPage && <>
-            <h1 className="dark:text-zinc-200 text-zinc-900 leading-none mb-3">{page?.title ?? "no title"}</h1>
-            <p className="dark:text-zinc-400 text-zinc-800 m-0 leading-tight">
-              {page?.description ?? "no description"}
-            </p>
-          </>} */}
           { children }
         </section>
       </main>

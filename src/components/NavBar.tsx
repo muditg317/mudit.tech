@@ -26,9 +26,7 @@ export default function NavBar<EntryType extends NavBarEntry>({ entries, isActiv
           const isActive = isActiveTab(item);
           const showBars = isActive || index === activeIndex - 1;
           return (<>
-            {/* {active && index > 0 && <NavGroupDivider key="div-mid-top" name="divider-midtop" heightClass="h-full" />} */}
             <motion.div layout layoutId={item.title}
-                // animate={{ scale: isActive ? 1.1 : 1 }}
                 className={`
                   my-2 aspect-square
                   grid place-items-center
@@ -54,34 +52,6 @@ export default function NavBar<EntryType extends NavBarEntry>({ entries, isActiv
           </>);
         })}
       </LayoutGroup>
-      {/* <NavGroupDivider name="divider-bottom" heightClass={`${activeIndex < entries.length - 1 ? "h-1/3" : "h-full"}`} /> */}
-      {/* <motion.div layout className="basis-1/2 w-full flex flex-col items-center mt-4">
-        {activeIndex > 0 && <NavBarOptionGroup
-          // @ts-expect-error slice guaranteed non-empty because of activeIndex > 0
-          entries={entries.slice(0, activeIndex)}
-          isActiveTab={isActiveTab}
-          onTabClick={onTabClick}
-        />}
-        <NavGroupDivider name="divider-top" heightClass={`h-full mb-4 ${activeIndex > 0 ? "mt-4" : "-mt-4"}`} />
-      </motion.div>
-      <NavBarOptionGroup
-          // @ts-expect-error slice guaranteed non-empty because of activeIndex > 0
-          entries={entries.slice(activeIndex, activeIndex + 1)}
-          isActiveTab={isActiveTab}
-          onTabClick={onTabClick}
-        />
-      <motion.div layout className="basis-1/2 w-full flex flex-col items-center">
-        {activeIndex < entries.length - 1 && <>
-          <NavGroupDivider name="divider-mid" heightClass="h-full my-4" />
-          <NavBarOptionGroup
-            // @ts-expect-error slice guaranteed non-empty because of activeIndex < entries length - 1
-            entries={entries.slice(activeIndex + 1)}
-            isActiveTab={isActiveTab}
-            onTabClick={onTabClick}
-          />
-        </>}
-        <NavGroupDivider name="divider-bottom" heightClass={`${activeIndex < entries.length - 1 ? "h-1/3" : "h-full"} mt-4`} />
-      </motion.div> */}
     </motion.div>
   );
 }
@@ -89,23 +59,6 @@ export default function NavBar<EntryType extends NavBarEntry>({ entries, isActiv
 function NavGroupDivider({ heightClass, name }: { heightClass: string, name: string }) {
   return (
     <motion.div layoutId={name} data-name={name} className={`border-r-2 rounded dark:border-zinc-800 border-zinc-500 ${heightClass}`} />
-  );
-}
-
-type NavBarOptionGroupProps<EntryType extends NavBarEntry>
-  = NavBarProps<EntryType>;
-function NavBarOptionGroup<EntryType extends NavBarEntry>({ entries, isActiveTab, onTabClick }: NavBarOptionGroupProps<EntryType>) {
-  return (
-    <div className="flex flex-col gap-4">
-      {entries.map(item => {
-        return (
-          <NavBarOption key={item.title}
-            item={item}
-            isActive={isActiveTab(item)}
-            onTabClick={onTabClick} />
-        );
-      })}
-    </div>
   );
 }
 

@@ -1,11 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { type NextPage } from "next";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { LayoutGroup, motion } from "framer-motion";
 
 import { api } from "~/utils/api";
 
-// const SUBSECTIONS = filteredPages("showOnMainPage", true);
 const PROJECTS = [
   {
     title: "this website",
@@ -16,8 +14,6 @@ const PROJECTS = [
 
 const Home: NextPage = () => {
   const hello = api.example.hello.useQuery({ text: "from tRPC" });
-
-  const [top, setTop] = useState(true);
 
   return (
     <>
@@ -33,18 +29,6 @@ const Home: NextPage = () => {
             <AuthShowcase />
           </div>
         </div>
-        {/* {new Array(10).fill(0).map((_, index) => (
-          <h1 key={index} data-nav-tab={`${index}`} className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
-            Mudit Gupta {index}<br />--foo foo {index} foo <br />--foo foo {index} foo <br />--foo foo {index} foo 
-          </h1>
-        ))} */}
-        <motion.div layout onClick={() => (console.log('top'), setTop(t=>!t))}>
-          <LayoutGroup>
-            {top && <motion.h1 layoutId="title" className="bg-blue-500">title</motion.h1>}
-            <motion.p layoutId="span" className="bg-red-500">garbage<br/>garbage<br/>garbage<br/></motion.p>
-            {!top && <motion.h1 layoutId="title" className="bg-green-500">title</motion.h1>}
-          </LayoutGroup>
-        </motion.div>
         <h1 className="text-5xl font-extrabold text-white sm:text-[5rem]">Projects</h1>
         {PROJECTS.map((project) => (
           <div key={project.title} className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
@@ -88,18 +72,3 @@ const AuthShowcase: React.FC = () => {
     </div>
   );
 };
-
-
-// export const getServerSideProps: GetServerSideProps = async (context) => {
-//   console.log(context.req.headers.referer);
-//   // const hello = await api.example.hello.fetchQuery({ text: "from getServerSideProps" });
-
-//   // return {
-//   //   props: {
-//   //     hello,
-//   //   },
-//   // };
-//   return {
-//     props: {},
-//   };
-// };
