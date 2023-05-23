@@ -27,6 +27,7 @@ export default function NavBar<EntryType extends NavBarEntry>({ entries, isActiv
           const showBars = isActive || index === activeIndex - 1;
           return (<>
             <motion.div layout layoutId={item.title}
+                key={item.title}
                 className={`
                   my-2 aspect-square
                   grid place-items-center
@@ -34,7 +35,6 @@ export default function NavBar<EntryType extends NavBarEntry>({ entries, isActiv
                 onClick={() => onTabClick(item)}
               >
               <NavBarOption
-                key={item.title}
                 {...{item, isActive}}
               />
             </motion.div>
