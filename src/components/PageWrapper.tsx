@@ -1,12 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
-// import Header from "./Header";
+import React, { useMemo } from "react";
 import Footer from "./Footer";
 
 import { useRouterWithPage } from "~/hooks";
 import Head from "next/head";
 import { MAIN_PAGE, navPages } from "~/content/urls";
 import NavBar from "./NavBar";
-import { PageConst } from "~/content/urls/pages";
+import type { PageConst } from "~/content/urls/pages";
 import { readonlyIncludes } from "~/utils/type-modifiers";
 
 type PageWrapperProps = {
@@ -16,8 +15,6 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
   const [router, currentRoute, page] = useRouterWithPage();
   // const [activeTab, setActiveTab] = useState<string>(currentRoute);
   const activeTab = currentRoute;
-
-  const onMainPage = page?.isMainPage ?? false;
 
   const navbar = useMemo(() => {
     return <NavBar<PageConst>

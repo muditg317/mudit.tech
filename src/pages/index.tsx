@@ -1,7 +1,5 @@
-import { GetServerSideProps, type NextPage } from "next";
+import { type NextPage } from "next";
 import { signIn, signOut, useSession } from "next-auth/react";
-import Link from "next/link";
-import { MAIN_PAGE, filteredPages, navPages } from "~/content/urls";
 
 import { api } from "~/utils/api";
 

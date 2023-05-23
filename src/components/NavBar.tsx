@@ -1,12 +1,5 @@
-import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
-import { MAIN_PAGE, navPages } from "~/content/urls";
-import { ArrayOf, ElementOf } from "~/utils/types";
-
-const NavbarItems = [
-  MAIN_PAGE,
-  ...navPages
-] as const;
+import { useMemo } from "react";
+import type { ArrayOf, ElementOf } from "~/utils/types";
 
 type NavBarEntry = {
   readonly title: string;
@@ -61,8 +54,8 @@ function NavGroupDivider({ heightClass }: { heightClass: string }) {
   );
 }
 
-interface NavBarOptionGroupProps<EntryType extends NavBarEntry>
-  extends NavBarProps<EntryType> {}
+type NavBarOptionGroupProps<EntryType extends NavBarEntry>
+  = NavBarProps<EntryType>;
 function NavBarOptionGroup<EntryType extends NavBarEntry>({ entries, isActiveTab, onTabClick }: NavBarOptionGroupProps<EntryType>) {
   return (
     <div className="flex flex-col gap-4">
@@ -82,7 +75,7 @@ interface NavBarOptionProps<EntryType extends NavBarEntry> {
   item: ElementOf<NavBarProps<EntryType>['entries']>;
   isActive: ReturnType<NavBarProps<EntryType>['isActiveTab']>;
   onTabClick: NavBarProps<EntryType>['onTabClick'];
-};
+}
 function NavBarOption<EntryType extends NavBarEntry>({ item, isActive, onTabClick }: NavBarOptionProps<EntryType>) {
   return (
     <button
