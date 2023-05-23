@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Footer from "./Footer";
 
 import { useRouterWithPage } from "~/hooks";
@@ -13,8 +13,12 @@ type PageWrapperProps = {
 };
 const PageWrapper = ({ children }: PageWrapperProps) => {
   const [router, currentRoute, page] = useRouterWithPage();
-  // const [activeTab, setActiveTab] = useState<string>(currentRoute);
-  const activeTab = currentRoute;
+  const [activeTab, setActiveTab] = useState<string>(currentRoute);
+  // const activeTab = currentRoute;
+  useEffect(() => {
+    setActiveTab(currentRoute);
+  }, [currentRoute]);
+  // (window as any).sat = setActiveTab;
 
   const navbar = useMemo(() => {
     return <NavBar<PageConst>
@@ -50,14 +54,14 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
     <div className="flex selection:bg-zinc-200/30 flex-col overflow-x-hidden min-h-screen items-center bg-zinc-100 dark:bg-zinc-900 font-clash max-h-auto relative">
       {/* <Palette /> used for KBar */}
       <header className="">
-        <nav className="w-[6%] fixed left-0 h-full z-50 hidden lg:block md:block">
+        <nav className="w-max pl-4 fixed left-0 h-full z-50 hidden lg:block md:block">
           { navbar }
         </nav>
         <nav className="fixed top-0 w-full z-50 block lg:hidden md:hidden px-8 pt-4">
           {/* <MobileNavBar path={currentRoute} /> */}
         </nav>
       </header>
-      <div className="w-full min-h-screen h-full flex flex-col items-center relative">
+      <main className="w-full min-h-screen h-full flex flex-col items-center relative">
         <section className="flex flex-col w-full justify-between mt-16 lg:mt-0 md:mt-0 prose">
           {/* <Header /> -- only for main page */}
           {/* {!page.isMainPage && <>
@@ -68,7 +72,7 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
           </>} */}
           { children }
         </section>
-      </div>
+      </main>
       <Footer />
     </div>
   </>);
