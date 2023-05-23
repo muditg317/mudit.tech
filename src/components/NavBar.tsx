@@ -35,7 +35,7 @@ export default function NavBar<EntryType extends NavBarEntry>({ entries, isActiv
               >
               <NavBarOption
                 key={item.title}
-                {...{item, isActive, onTabClick}}
+                {...{item, isActive}}
               />
             </motion.div>
             {<NavGroupDivider
@@ -65,9 +65,8 @@ function NavGroupDivider({ heightClass, name }: { heightClass: string, name: str
 interface NavBarOptionProps<EntryType extends NavBarEntry> {
   item: ElementOf<NavBarProps<EntryType>['entries']>;
   isActive: ReturnType<NavBarProps<EntryType>['isActiveTab']>;
-  onTabClick: NavBarProps<EntryType>['onTabClick'];
 }
-function NavBarOption<EntryType extends NavBarEntry>({ item, isActive, onTabClick }: NavBarOptionProps<EntryType>) {
+function NavBarOption<EntryType extends NavBarEntry>({ item, isActive }: NavBarOptionProps<EntryType>) {
   return (
     <button
         className={`

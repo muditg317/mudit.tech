@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import Footer from "./Footer";
 
 import { useRouterWithPage } from "~/hooks";
