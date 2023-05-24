@@ -21,25 +21,24 @@ export default function NavBar<EntryType extends NavBarEntry>({ entries, isActiv
         transition={{ duration: 3 }}
         className="w-full min-h-full h-full flex flex-col justify-start items-center">
       <LayoutGroup>
-        <NavGroupDivider name="divider-top" heightClass={`${activeIndex > 0 ? "h-0" : "h-full"} mb-2`} />
+        <NavGroupDivider name="div-top" heightClass={`${activeIndex > 0 ? "h-0" : "h-full"} mb-2`} />
         {entries.map((item, index) => {
           const isActive = isActiveTab(item);
           const showBars = isActive || index === activeIndex - 1;
-          return (<>
+          // console.log("key=",item.title,`div-${item.title}`);
+          return (<React.Fragment key={item.title}>
             <motion.div layout layoutId={item.title}
-                key={item.title}
+                // key={item.title}
                 className={`
                   my-2 aspect-square
                   grid place-items-center
                 `.replace(/\s+/g, " ")}
                 onClick={() => onTabClick(item)}
               >
-              <NavBarOption
-                {...{item, isActive}}
-              />
+              <NavBarOption {...{item, isActive}} />
             </motion.div>
-            {<NavGroupDivider
-              key={`div-${item.title}`}
+            <NavGroupDivider
+              // key={`div-${item.title}`}
               name={`div-${item.title}`}
               heightClass={`
                 ${showBars
@@ -48,8 +47,8 @@ export default function NavBar<EntryType extends NavBarEntry>({ entries, isActiv
                     ? "h-1/3 my-2"
                     : "h-0")}
                 last:mb-0`.replace(/\s+/g, " ")}
-              />}
-          </>);
+              />
+          </React.Fragment>);
         })}
       </LayoutGroup>
     </motion.div>
@@ -58,7 +57,7 @@ export default function NavBar<EntryType extends NavBarEntry>({ entries, isActiv
 
 function NavGroupDivider({ heightClass, name }: { heightClass: string, name: string }) {
   return (
-    <motion.div layoutId={name} data-name={name} className={`border-r-2 rounded dark:border-zinc-800 border-zinc-500 ${heightClass}`} />
+    <motion.div key={name} layoutId={name} data-name={name} className={`border-r-2 rounded dark:border-zinc-800 border-zinc-500 ${heightClass}`} />
   );
 }
 

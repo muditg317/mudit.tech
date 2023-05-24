@@ -110,3 +110,10 @@ export type ArrayOf<Quantifier extends 'exactly' | 'at least', Count extends num
     Type,
     []
 >;
+
+/** Merge two tuples (assumes they have same length) */
+export type ZipTuple<T extends readonly unknown[], U extends readonly unknown[]> = {
+    [K in keyof T]: [T[K], K extends keyof U ? U[K] : never]
+  }
+
+export type ExactEntries<Obj extends object> = ZipTuple<TuplifyUnion<keyof Obj>, TuplifyUnion<Obj[keyof Obj]>>;

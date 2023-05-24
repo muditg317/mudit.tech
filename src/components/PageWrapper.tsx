@@ -21,15 +21,15 @@ type MotionAnimation = NonNullable<AnimationProps["initial"]>;
 type CustomGen<T> = (custom: MotionCustom) => T;
 type MotionVariantType<T> = T|CustomGen<T>;
 const pageAnimations = {
-  screenXEnter: (direction: direction) => ({ opacity: 1, x: 200 * (direction === "left" ? -1 : 1), y: 0 } as const),
-  screenXExit: (direction: direction) => ({ opacity: 1, x: 200 * (direction === "left" ? 1 : -1), y: 0 } as const),
+  screenXEnter: (direction: direction) => ({ opacity: 0, zIndex: 1, x: 200 * (direction === "left" ? 1 : -1), y: 0 } as const), // left flow -> enter from right
+  screenXExit: (direction: direction) => ({ opacity: 0, zIndex: 1, x: 200 * (direction === "left" ? -1 : 1), y: 0 } as const), // left flow -> exit to left
   // screenTop: { opacity: 0, x: 0, y: -200 },
   // screenBottom: { opacity: 0, x: 0, y: 200 },
-  visible: { opacity: 1, x: 0, y: 0 },
+  visible: { opacity: 1, zIndex: 1, x: 0, y: 0 },
 } as const satisfies Record<string, MotionVariantType<MotionAnimation>>;
 const transitionStyles = {
-  slow: { type: 'linear', duration: 0.5 },
-  fast: { type: 'linear', duration: 0.3 },
+  enter: { type: 'linear', duration: 5 },
+  exit: { type: 'linear', duration: 3 },
 } as const satisfies Record<string, Transition>;
 
 type Variant = ValueOf<typeof pageAnimations> & {
@@ -41,54 +41,18 @@ const pageAnimationVariants = Object.fromEntries(
     const [key, value] = kv;
     return [kv, ...exactEntries(transitionStyles).map((kv2) => {
       const [key2, value2] = kv2;
-      type funcVals = Extract<typeof value, (dir: direction) => object>;
+      type funcVals = Extract<typeof value, (custom:MotionCustom) => object>;
       function isFuncVal(v: typeof value): v is funcVals { return typeof v === "function" }
       return [`${key}-${key2}`, isFuncVal(value)
-        ? (dir:direction) => ({ ...value(dir), transition: value2 })
-        : { ...value, transition: value2 }
+        ? (custom:MotionCustom) => {
+          const oldValue = value(custom);
+          return { ...oldValue, transition: value2 };
+        }
+        : { ...value, transition: {...value, value2} }
       ] as const;
     })];
   })
 ) as VariantRecord;
-interface BetterProps<
-    Type extends keyof ReactHTML,
-    VariantType extends Variants,
-    CustomAnimationData
-  > extends Omit<MotionProps, "variants">, Omit<HTMLAttributes<Type>, keyof MotionProps> {
-  variants?: VariantType,
-  initial?: keyof VariantType & string,
-  animate?: keyof VariantType & string,
-  exit?: keyof VariantType & string,
-  custom?: CustomAnimationData
-}
-// type t = HTMLMotionProps<"section">;
-// type Exact<A,B> = A extends B ? B extends A ? A : never : never;
-// interface foo<T extends t = t> extends Exact<t,T> {
-//   variants?: VariantRecord,
-// }
-// type tf = foo['variants'];
-// function WithBetterVariantTypes<
-//     VariantType extends Variants,
-//     CustomAnimationData,
-//     HTMLElementType extends keyof ReactHTML,
-//     OldProps = HTMLMotionProps<HTMLElementType>,
-//     MotionComponent = (p: OldProps) => (ReactElement|null),
-//     NewProps = BetterProps<HTMLElementType, VariantType, CustomAnimationData>
-//   >(Comp: MotionComponent): (p: OldProps) => ReactElement {
-//   return Comp as (p: OldProps) => ReactElement;
-// }
-// const FancySection = WithBetterVariantTypes<VariantRecord, MotionCustom, "section">(motion.section);
-
-type WithBetterProps<V extends Variants, C> = typeof motion & {
-  [K in keyof ReactHTML]: ForwardRefComponent<ReactHTML[K], BetterProps<K, V, C>>;
-};
-
-const Motion = new Proxy(motion, {
-  get: (target, prop, receiver) => {
-    return Reflect.get(target, prop, receiver);
-  }
-}) as WithBetterProps<VariantRecord, MotionCustom>;
-const foo = <Motion.section variants={pageAnimationVariants} initial="we"></Motion.section>
 
 type PageWrapperProps = {
   children: React.ReactNode;
@@ -105,8 +69,8 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
       previousTab !== undefined && previousTab != activeTab,
     [previousTab, activeTab]);
   const pageAnimCustom = useRef<MotionCustom>("left");
-  useEffect(() => {
-    if (previousTab === undefined) return;
+  // useEffect(() => {
+  if (previousTab !== undefined) {
     const activeInd = navEntries.findIndex(entry => readonlyIncludes(entry.aliases, activeTab));
     const prevInd = navEntries.findIndex(entry => readonlyIncludes(entry.aliases, previousTab));
     if (activeInd < prevInd) {
@@ -115,9 +79,10 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
       pageAnimCustom.current = "left";
     } else {
     }
-  }, [activeTab, previousTab]);
+  }
+  // }, [activeTab, previousTab]);
 
-  // console.log({ activeTab, previousTab });
+  // console.log({ activeTab, previousTab, custom: pageAnimCustom.current });
 
   const navTabIsActiveCb = useCallback((entry: PageConst) => {
     return readonlyIncludes(entry.aliases, activeTab);
@@ -125,40 +90,6 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
   const navTabClickCb = useCallback((entry: PageConst) => {
     void router.push(`/${entry.aliases[0]}`);
   }, [router]);
-
-  // const pageAnimRef = useRef<[keyof VariantRecord, keyof VariantRecord]>(["visible","visible"]);
-  
-  // // const [pageAnimInitial, pageAnimExit] = useMemo<[keyof VariantRecord, keyof VariantRecord]>(() => {
-  // // useEffect(() => {
-  //   let result: [keyof typeof pageAnimations, keyof typeof pageAnimations] = ["screenRight", "screenLeft"];
-  //   const enterStyle = "slow" as const satisfies keyof typeof transitionStyles;
-  //   const exitStyle = "fast" as const satisfies keyof typeof transitionStyles;
-  //   // console.log("prevTab",previousTab);
-  //   if (previousTab !== undefined) {
-  //     const activeInd = navEntries.findIndex(entry => readonlyIncludes(entry.aliases, activeTab));
-  //     const prevInd = navEntries.findIndex(entry => readonlyIncludes(entry.aliases, previousTab));
-  //     // console.log("activeInd", activeInd);
-  //     // console.log("prevInd", prevInd);
-  //     if (activeInd < prevInd) {
-  //       result = [result[1], result[0]];
-  //     } else if (activeInd === prevInd) {
-  //       result = ["visible", "visible"];
-  //     }
-  //   }
-  //   if (tabChanged) {
-  //     console.log({from: result[0], to: result[1]});
-  //     pageAnimRef.current = [`${result[0]}-${enterStyle}`, `${result[1]}-${exitStyle}`];
-  //   }
-  // // }, [activeTab, previousTab]);
-  // const [pageAnimInitial, pageAnimExit] = pageAnimRef.current;
-
-  // const [pageInAnim, forceRender] = useState<keyof VariantRecord>("visible");
-  // // const forceRender = useCallback(() => f(v=>v+1), [f]);
-  // if (tabChanged) {
-  //   console.log("tab change", previousTab, "->", activeTab);
-  //   updatePrevTab(activeTab);
-  //   if (pageAnimInitial !== "visible") forceRender(pageAnimInitial);
-  // }
 
   if (!page) {
     return <>
@@ -203,7 +134,7 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
       </header>
       <main className="w-full min-h-screen h-full flex flex-col items-center">
         <AnimatePresence
-            // mode="wait"
+            mode="popLayout"
             initial={false}
             onExitComplete={() => {
               // console.log("page exited");
@@ -215,14 +146,14 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
               className="flex flex-col w-full justify-between mt-16 lg:mt-0 md:mt-0 prose"
               data-page-name={currentRoute}
               key={activeTab}
-              initial="screenXEnter-slow"
-              animate="visible-slow"
-              exit="screenXExit-fast"
+              initial="screenXEnter-enter"
+              animate="visible-enter"
+              exit="screenXExit-exit"
               variants={pageAnimationVariants}
               custom={pageAnimCustom.current}
               transition={{ type: "linear" }}
             >
-            {(() => {
+            {/* {(() => {
               console.log("current page is -- ", {
                 tabChanged,
                 key: activeTab,
@@ -231,25 +162,9 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
                 'enter:',(pageAnimations["screenXEnter"])(pageAnimCustom.current)
               );
               return <></>;
-            })()}
+            })()} */}
             { children }
           </motion.section>
-          {/* {tabChanged && <>
-            <motion.section
-                className="flex flex-col w-full justify-between mt-16 lg:mt-0 md:mt-0 prose"
-                key={previousTab}
-                initial={pageAnimInitial}
-                animate="visible"
-                exit={pageAnimExit}
-                variants={pageAnimationVariants}
-                transition={{ type: "linear" }}
-              >
-              {(() => {
-                console.log("show previous page -- ", {key:previousTab, from:pageAnimInitial, to:pageAnimExit});
-                return <></>;
-              })()}
-            </motion.section>
-          </>} */}
         </AnimatePresence>
       </main>
       <Footer />

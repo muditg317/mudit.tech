@@ -5,7 +5,7 @@ import { pageWithAlias } from "~/content/urls";
  * gets the current page object from the content source
  * @returns [page, currentRoute]
  */
-const useRouterWithPage = () => {
+export default function useRouterWithPage() {
   const router = useRouter();
   const currentRoute = router.pathname.substring(1);
   // console.log(router, currentRoute);
@@ -15,6 +15,4 @@ const useRouterWithPage = () => {
   // console.log(page);
 
   return [router, currentRoute, page] as const;
-};
-
-export default useRouterWithPage;
+}
