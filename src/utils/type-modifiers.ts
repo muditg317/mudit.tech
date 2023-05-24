@@ -1,4 +1,4 @@
-import type { ElementOf, ExactEntries, TuplifyUnion, ValueOf, ZipTuple } from "./types";
+import type { ElementOf, ExactEntries, ValueOf } from "./types";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function readonlyIncludes<Arr extends ReadonlyArray<any>, const V>(array: Arr, item: V): V extends ElementOf<Arr> ? true : boolean {

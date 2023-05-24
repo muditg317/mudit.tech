@@ -1,4 +1,4 @@
-import React, { ComponentProps, ExoticComponent, FunctionComponent, HTMLAttributes, PropsWithChildren, ReactElement, ReactHTML, ReactPropTypes, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useRef } from "react";
 import Footer from "./Footer";
 
 import { usePrevious, useRouterWithPage } from "~/hooks";
@@ -6,9 +6,9 @@ import Head from "next/head";
 import { MAIN_PAGE, navPages } from "~/content/urls";
 import NavBar from "./NavBar";
 import type { PageConst } from "~/content/urls/pages";
-import { exactEntries, fromExactEntries, readonlyIncludes } from "~/utils/type-modifiers";
-import { AnimatePresence, AnimationProps, ForwardRefComponent, HTMLMotionProps, MotionProps, MotionStyle, Transition, Variants, createDomMotionComponent, motion } from "framer-motion";
-import { ElementOf, ExactEntries, TuplifyUnion, ValueOf } from "~/utils/types";
+import { exactEntries, readonlyIncludes } from "~/utils/type-modifiers";
+import { AnimatePresence, type AnimationProps, type Transition, motion } from "framer-motion";
+import type { ValueOf } from "~/utils/types";
 
 const navEntries = [
   MAIN_PAGE,
@@ -64,10 +64,10 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
   //   setActiveTab(currentRoute);
   // }, [currentRoute]);
   const activeTab = currentRoute;
-  const [previousTab, updatePrevTab] = usePrevious(activeTab);
-  const tabChanged = useMemo(() =>
-      previousTab !== undefined && previousTab != activeTab,
-    [previousTab, activeTab]);
+  const [previousTab,] = usePrevious(activeTab);
+  // const tabChanged = useMemo(() =>
+  //     previousTab !== undefined && previousTab != activeTab,
+  //   [previousTab, activeTab]);
   const pageAnimCustom = useRef<MotionCustom>("left");
   // useEffect(() => {
   if (previousTab !== undefined) {

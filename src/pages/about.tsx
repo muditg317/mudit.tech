@@ -1,11 +1,10 @@
-import React, { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import React from "react";
 import { type NextPage } from "next";
 
 
 const About: NextPage = () => {
 
-  const [show, setShow] = useState(false);
+  // const [show, setShow] = useState(false);
 
   return (
     <>
