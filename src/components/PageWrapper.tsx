@@ -21,34 +21,42 @@ type MotionAnimation = NonNullable<AnimationProps["initial"]>;
 type CustomGen<T> = (custom: MotionCustom) => T;
 type MotionVariantType<T> = T|CustomGen<T>;
 const pageAnimations = {
-  screenXEnter: (direction: direction) => ({ opacity: 0, zIndex: 1, x: 200 * (direction === "left" ? 1 : -1), y: 0 } as const), // left flow -> enter from right
-  screenXExit: (direction: direction) => ({ opacity: 0, zIndex: 1, x: 200 * (direction === "left" ? -1 : 1), y: 0 } as const), // left flow -> exit to left
+  screenXEnter: (direction: direction) => ({ opacity: 0, zIndex: 0, x: 200 * (direction === "left" ? 1 : -1), y: 0 } as const), // left flow -> enter from right
+  screenXExit: (direction: direction) => ({ opacity: 0, zIndex: 0, x: 200 * (direction === "left" ? -1 : 1), y: 0 } as const), // left flow -> exit to left
   // screenTop: { opacity: 0, x: 0, y: -200 },
   // screenBottom: { opacity: 0, x: 0, y: 200 },
   visible: { opacity: 1, zIndex: 1, x: 0, y: 0 },
 } as const satisfies Record<string, MotionVariantType<MotionAnimation>>;
 const transitionStyles = {
-  enter: { type: 'linear', duration: 5 },
-  exit: { type: 'linear', duration: 3 },
+  enter: { type: 'linear', duration: 0.5 },
+  exit: { type: 'linear', duration: 0.2 },
 } as const satisfies Record<string, Transition>;
 
-type Variant = ValueOf<typeof pageAnimations> & {
+type TransitionProps = {
   readonly transition: ValueOf<typeof transitionStyles>;
-};
+}
+
+type FunctionalAnimations = Extract<ValueOf<typeof pageAnimations>, CustomGen<MotionAnimation>>;
+
+type Variant = (Exclude<ValueOf<typeof pageAnimations>, FunctionalAnimations> & TransitionProps)
+ | CustomGen<ReturnType<FunctionalAnimations> & TransitionProps>;
 type VariantRecord = Record<`${keyof typeof pageAnimations}-${keyof typeof transitionStyles}`|keyof typeof pageAnimations, Variant>;
+// type FunctionalVariant = Extract<ValueOf<typeof pageAnimationVariants>, CustomGen<unknown>>;
+
 const pageAnimationVariants = Object.fromEntries(
   exactEntries(pageAnimations).flatMap((kv) => {
     const [key, value] = kv;
     return [kv, ...exactEntries(transitionStyles).map((kv2) => {
       const [key2, value2] = kv2;
-      type funcVals = Extract<typeof value, (custom:MotionCustom) => object>;
+      type funcVals = Extract<typeof value, CustomGen<MotionAnimation>>;
       function isFuncVal(v: typeof value): v is funcVals { return typeof v === "function" }
+      const existingTransition = 'transition' in value ? value.transition as Transition : {};
       return [`${key}-${key2}`, isFuncVal(value)
         ? (custom:MotionCustom) => {
           const oldValue = value(custom);
           return { ...oldValue, transition: value2 };
         }
-        : { ...value, transition: {...value, value2} }
+        : { ...value, transition: {...existingTransition, ...value2} }
       ] as const;
     })];
   })
@@ -59,17 +67,9 @@ type PageWrapperProps = {
 };
 const PageWrapper = ({ children }: PageWrapperProps) => {
   const [router, currentRoute, page] = useRouterWithPage();
-  // const [activeTab, setActiveTab] = useState<string>(currentRoute);
-  // useEffect(() => {
-  //   setActiveTab(currentRoute);
-  // }, [currentRoute]);
   const activeTab = currentRoute;
   const [previousTab,] = usePrevious(activeTab);
-  // const tabChanged = useMemo(() =>
-  //     previousTab !== undefined && previousTab != activeTab,
-  //   [previousTab, activeTab]);
   const pageAnimCustom = useRef<MotionCustom>("left");
-  // useEffect(() => {
   if (previousTab !== undefined) {
     const activeInd = navEntries.findIndex(entry => readonlyIncludes(entry.aliases, activeTab));
     const prevInd = navEntries.findIndex(entry => readonlyIncludes(entry.aliases, previousTab));
@@ -80,9 +80,7 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
     } else {
     }
   }
-  // }, [activeTab, previousTab]);
 
-  // console.log({ activeTab, previousTab, custom: pageAnimCustom.current });
 
   const navTabIsActiveCb = useCallback((entry: PageConst) => {
     return readonlyIncludes(entry.aliases, activeTab);
@@ -137,7 +135,6 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
             mode="popLayout"
             initial={false}
             onExitComplete={() => {
-              // console.log("page exited");
               window.scrollTo(0, 0);
             }}
             custom={pageAnimCustom.current}
@@ -153,16 +150,6 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
               custom={pageAnimCustom.current}
               transition={{ type: "linear" }}
             >
-            {/* {(() => {
-              console.log("current page is -- ", {
-                tabChanged,
-                key: activeTab,
-              },'\n',
-                'exit:',(pageAnimations["screenXExit"])(pageAnimCustom.current),
-                'enter:',(pageAnimations["screenXEnter"])(pageAnimCustom.current)
-              );
-              return <></>;
-            })()} */}
             { children }
           </motion.section>
         </AnimatePresence>
