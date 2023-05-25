@@ -20,16 +20,22 @@ type MotionCustom = direction;
 type MotionAnimation = NonNullable<AnimationProps["initial"]>;
 type CustomGen<T> = (custom: MotionCustom) => T;
 type MotionVariantType<T> = T|CustomGen<T>;
+const dirToSign = {
+  left: -1,
+  right: 1,
+} as const satisfies Record<direction, -1|1>;
+const translation = 50 as const;
+const rotation = 90 as const;
 const pageAnimations = {
-  screenXEnter: (direction: direction) => ({ opacity: 0, zIndex: 0, x: 200 * (direction === "left" ? 1 : -1), y: 0 } as const), // left flow -> enter from right
-  screenXExit: (direction: direction) => ({ opacity: 0, zIndex: 0, x: 200 * (direction === "left" ? -1 : 1), y: 0 } as const), // left flow -> exit to left
+  screenXEnter: (direction: direction) => ({ opacity: 0, zIndex: 0, x: `${translation * -dirToSign[direction]}%`, y: 0, rotateY: rotation * -dirToSign[direction] } as const), // left flow -> enter from right
+  screenXExit: (direction: direction) => ({ opacity: 0, zIndex: 0, x: `${translation * dirToSign[direction]}%`, y: 0, rotateY: rotation * dirToSign[direction] } as const), // left flow -> exit to left
   // screenTop: { opacity: 0, x: 0, y: -200 },
   // screenBottom: { opacity: 0, x: 0, y: 200 },
-  visible: { opacity: 1, zIndex: 1, x: 0, y: 0 },
+  visible: { opacity: 1, zIndex: 1, x: 0, rotateY: 0 },
 } as const satisfies Record<string, MotionVariantType<MotionAnimation>>;
 const transitionStyles = {
-  enter: { type: 'linear', duration: 0.5 },
-  exit: { type: 'linear', duration: 0.2 },
+  enter: { duration: 0.5 },
+  exit: { duration: 0.2 },
 } as const satisfies Record<string, Transition>;
 
 type TransitionProps = {
@@ -132,7 +138,7 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
       </header>
       <main className="w-full min-h-screen h-full flex flex-col items-center">
         <AnimatePresence
-            mode="popLayout"
+            mode="sync"
             initial={false}
             onExitComplete={() => {
               window.scrollTo(0, 0);
@@ -148,7 +154,7 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
               exit="screenXExit-exit"
               variants={pageAnimationVariants}
               custom={pageAnimCustom.current}
-              transition={{ type: "linear" }}
+              transition={{ type: "intertia" }}
             >
             { children }
           </motion.section>
