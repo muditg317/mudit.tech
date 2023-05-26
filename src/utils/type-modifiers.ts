@@ -1,9 +1,16 @@
-import type { ElementOf, ExactEntries, ValueOf } from "./types";
+import type { ElementOf, ExactEntries, DistributedTuple2ArrayOfUnion, ReadonlyArrayTupleOfConst, ValueOf } from "./types";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function readonlyIncludes<Arr extends ReadonlyArray<unknown>, const V>(array: Arr, item: V): V extends ElementOf<Arr> ? true : boolean {
+export function readonlyIncludes<const Arr extends ReadonlyArray<unknown>, const V>(array: Arr, item: V): V extends ElementOf<Arr> ? true : boolean {
   // @ts-expect-error - TS doesn't know that V extends ElementOf<Arr> -> V is in Arr
   return array.includes(item);
+}
+
+export function readonlyFilter<const Arr extends ReadonlyArray<unknown>, S extends ElementOf<Arr>, Filter extends ((c:ElementOf<Arr>) => c is S)|((c:ElementOf<Arr>) => boolean)>(array: Arr, filterFn: Filter) {
+  type ResultType =
+    Filter extends ((c:ElementOf<Arr>) => c is infer F extends ElementOf<Arr>)
+      ? ReadonlyArrayTupleOfConst<F>
+      : DistributedTuple2ArrayOfUnion<Arr>;
+  return (array as ReadonlyArray<ElementOf<Arr>>).filter(filterFn) as ResultType;
 }
 
 export function exactEntries<const Obj extends object, OutType=ExactEntries<Obj>>(obj: Obj): OutType {

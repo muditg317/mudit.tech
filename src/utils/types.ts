@@ -106,11 +106,12 @@ type BuildArrayOf<
     Count extends number,
     Type,
     Current extends Type[]
-    > = Current['length'] extends Count
-    ? Quantifier extends 'exactly'
-    ? [...Current]
-    : [...Current, ...Type[]]
-    : BuildArrayOf<Quantifier, Count, Type, [...Current, Type]>;
+> =
+    Current['length'] extends Count
+        ? Quantifier extends 'exactly'
+            ? [...Current]
+            : [...Current, ...Type[]]
+        : BuildArrayOf<Quantifier, Count, Type, [...Current, Type]>;
 
 /** An array of a given type comprised of either exactly or at least a certain count of that type. */
 export type ArrayOf<Quantifier extends 'exactly' | 'at least', Count extends number, Type> = BuildArrayOf<
@@ -127,3 +128,12 @@ export type ZipTuple<T extends readonly unknown[], U extends readonly unknown[]>
 
 /** Get the exact entries of an object if possible */
 export type ExactEntries<Obj extends object> = ZipTuple<TuplifyUnion<keyof Obj>, TuplifyUnion<Obj[keyof Obj]>>;
+
+/** General utility type for readonly array of given union type */
+export type ReadonlyArrayTupleOfConst<C> = ReadonlyTuplifyUnion<C> & ReadonlyArrayMethods<C>;
+
+/** Apply */
+// type GenericFilteredList<L extends ArrayLike<unknown>> = {
+//   [I in keyof TuplifyUnion<L>]: ElementOf<TuplifyUnion<L>[I]>;
+// }[IndicesOf<TuplifyUnion<L>>]
+export type DistributedTuple2ArrayOfUnion<L> = L extends ArrayLike<infer T> ? ReadonlyArray<T> : never;

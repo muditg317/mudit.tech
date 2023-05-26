@@ -1,6 +1,6 @@
-import type { ArrayOf, ElementOf, ReadonlyTuplifyUnion, ValueOf } from "~/utils/types";
-import type { GetArrayFieldValues, ValidatedList } from "./urls/types";
-import { filterFuncsFor } from "./manipulators";
+import type { ArrayOf, ElementOf, ValueOf } from "~/utils/types";
+import type { CapitalizedString, GetArrayFieldValues, MultiWord } from "./urls/types";
+import { type ValidateListField, filterFuncsFor } from "./manipulators";
 
 const Language = {
   CPP: "C++",
@@ -15,8 +15,9 @@ const Tags = {
 // type Tags = ValueOf<typeof Tags>;
 
 interface Project {
-  title: string | JSX.Element;
-  subtitle?: string | JSX.Element;
+  title: CapitalizedString;
+  subtitle?: string;
+  aliases: Readonly<ArrayOf<'at least', 1, string>>;
   startDate: Date;
   endDate: Date;
   languages: Readonly<ArrayOf<'at least', 1, ValueOf<typeof Language>>>;
@@ -28,6 +29,7 @@ export const PROJECTS = [
   {
     title: "Bokay: Custom C-style language",
     subtitle: "Programming language created from scratch",
+    aliases: ["bokay"],
     startDate: new Date(2021, 10, 10),
     endDate: new Date(),
     languages: [Language.CPP],
@@ -37,6 +39,17 @@ export const PROJECTS = [
   {
     title: "Termdraw",
     subtitle: "Graphics Library for the Terminal",
+    aliases: ["termdraw"],
+    startDate: new Date(2021, 10, 21),
+    endDate: new Date(), //2021,10,28),
+    languages: [Language.CPP],
+    tags: [Tags.Graphics, Tags.Terminal],
+    contents: "I made a graphics library for drawing in the terminal with a series of braille characters (to get more pixels than console size). The library provides a similar API to p5.js."
+  },
+  {
+    title: "Bokay 2 for testing",
+    subtitle: "Programming language created from scratch",
+    aliases: ["termddraw", "bodkay"],
     startDate: new Date(2021, 10, 21),
     endDate: new Date(), //2021,10,28),
     languages: [Language.CPP],
@@ -44,30 +57,22 @@ export const PROJECTS = [
     contents: "I made a graphics library for drawing in the terminal with a series of braille characters (to get more pixels than console size). The library provides a similar API to p5.js."
   },
 ] as const satisfies ReadonlyArray<Project>;
-// PROJECTS satisfies ValidatedList<typeof PROJECTS, Project, never>;
+PROJECTS satisfies ValidateListField<Project, 'aliases', typeof PROJECTS, 'no duplicates', MultiWord|CapitalizedString|"">;
 
 
-(PROJECTS as unknown as Array<Project>)
-    .sort((a,b) => b.startDate.valueOf() - a.startDate.valueOf()) // subsort by start date
-    .sort((a,b) => b.endDate.valueOf() - a.endDate.valueOf());    // sort by end date
+// (PROJECTS as unknown as Array<Project>)
+//     .sort((a,b) => b.startDate.valueOf() - a.startDate.valueOf()) // subsort by start date
+//     .sort((a,b) => b.endDate.valueOf() - a.endDate.valueOf());    // sort by end date
 
-export type ConstProjects = typeof PROJECTS;
-export type ProjectConst = ElementOf<ConstProjects>;
-export function excluding<F extends keyof ProjectConst, V extends ProjectConst[F]>(flagName: F, value: V) {
-  type FilteredProject = Exclude<ProjectConst, {[K in F]: V}>;
-  function filterFunc(page: ProjectConst): page is FilteredProject {
-    return page[flagName] !== value;
-  }
-  const filteredProjects = PROJECTS.filter(filterFunc);
-  return filteredProjects as ReadonlyTuplifyUnion<FilteredProject>;
-  // return arrayAsReadonly(filteredProjects as TuplifyUnion<ElementOf<typeof filteredProjects>>);
-}
+type ConstProjects = typeof PROJECTS;
+type ProjectConst = ElementOf<ConstProjects>;
 export type AllTags = GetArrayFieldValues<typeof PROJECTS, 'tags', ProjectConst>;
 
-// export const filteredProjects = filterFor(PROJECTS);
-// export const projectWhere = whereFuncFor(PROJECTS);
 
 export const projectFilter = filterFuncsFor(PROJECTS);
-// const foo = projectFilter('title', 'Termdraw');
+// const foo = projectFilter('subtitle', 'Programming language created from scratch');
 // type t = typeof foo[number]['title'];
-// const bar = projectFilter.firstOf('title', 'Termdraw');
+// const bar = projectFilter.firstOf('subtitle', 'Programming language created from scratch');
+// type t2 = typeof bar['title'];
+// const exc = projectFilter.excluding('title', 'Termdraw');
+// type t3 = typeof exc[number]['title'];

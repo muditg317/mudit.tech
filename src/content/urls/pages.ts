@@ -1,6 +1,7 @@
 import type {ElementOf, ReadonlyTuplifyUnion, TuplifyUnion} from '~/utils/types';
-import type { GetAliases, MultiWord, UrlEntry, ValidatedList } from './types';
-import {EntryType} from './types';
+import type { GetAliases, MultiWord, UrlEntry } from './types';
+import { EntryType } from './types';
+import type { ValidateListField } from '../manipulators';
 
 export type InvalidPageAlias = MultiWord;
 
@@ -59,7 +60,8 @@ export const PAGES = [
     entryType: EntryType.Page,
   },
 ] as const satisfies ReadonlyArray<Page>;
-PAGES satisfies ValidatedList<typeof PAGES, Page, InvalidPageAlias>;
+PAGES satisfies ValidateListField<Page, 'aliases', typeof PAGES, 'no duplicates', InvalidPageAlias>;
+// PAGES satisfies ValidatedList<typeof PAGES, Page, InvalidPageAlias>;
 // typeCheckFn<typeof PAGES, Page, InvalidPageAlias>(PAGES);
 
 export type ConstPages = typeof PAGES;

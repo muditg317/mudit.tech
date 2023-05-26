@@ -9,7 +9,7 @@ type ExtractWords<T extends string, Invalid=DefaultInvalid> = Exclude<T, Invalid
 type Aliases<T extends string, Invalid=MultiWord|EmptyString> = ExtractWords<T, Invalid> extends never ? never : readonly ExtractWords<T, Invalid>[];
 
 type CapitalLetter = 'A'|'B'|'C'|'D'|'E'|'F'|'G'|'H'|'I'|'J'|'K'|'L'|'M'|'N'|'O'|'P'|'Q'|'R'|'S'|'T'|'U'|'V'|'W'|'X'|'Y'|'Z';
-type CapitalizedString = `${CapitalLetter}${string}`;
+export type CapitalizedString = `${CapitalLetter}${string}`;
 
 export enum EntryType {
   Redirect = 'Redirect',
@@ -46,7 +46,7 @@ type Reused<UrlEntries extends ReadonlyArray<T>, T extends UrlEntry, Unions exte
 export type ValidatedList<UrlEntries extends ReadonlyArray<T>, T extends EntryTypeUnion, InvalidAliases extends string> =
     Reused<UrlEntries, T, AliasUnions<UrlEntries, T>> extends never
     ? InterfaceFollowingList<GetAliases<UrlEntries, T>, InvalidAliases, T>
-    : Reused<UrlEntries, T, AliasUnions<UrlEntries, T>>;
+    : `data list should not repeat aliases: found '${Reused<UrlEntries, T, AliasUnions<UrlEntries, T>>}'`;
 
 // export function typeCheckFn<
 //     EntriesToCheck extends ReadonlyArray<T>,
