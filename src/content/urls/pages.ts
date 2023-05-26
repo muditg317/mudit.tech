@@ -1,4 +1,4 @@
-import type {ElementOf, ReadonlyTuplifyUnion, TuplifyUnion} from '~/utils/types';
+import type {ElementOf} from '~/utils/types';
 import type { GetAliases, MultiWord, UrlEntry } from './types';
 import { EntryType } from './types';
 import type { ValidateListField } from '../manipulators';
@@ -66,20 +66,4 @@ PAGES satisfies ValidateListField<Page, 'aliases', typeof PAGES, 'no duplicates'
 
 export type ConstPages = typeof PAGES;
 export type PageConst = ElementOf<ConstPages>;
-export function excluding<F extends keyof PageConst, V extends PageConst[F]>(flagName: F, value: V) {
-  type FilteredPage = Exclude<PageConst, {[K in F]: V}>;
-  function filterFunc(page: PageConst): page is FilteredPage {
-    return page[flagName] !== value;
-  }
-  const filteredPages = PAGES.filter(filterFunc);
-  return filteredPages as ReadonlyTuplifyUnion<FilteredPage>;
-  // return arrayAsReadonly(filteredPages as TuplifyUnion<ElementOf<typeof filteredPages>>);
-}
-export function where<F extends keyof PageConst, V extends PageConst[F]>(flagName: F, value: V) {
-  type FilteredPage = Extract<PageConst, {[K in F]: V}>;
-  function filterFunc(page: PageConst): page is FilteredPage {
-    return page[flagName] === value;
-  }
-  return PAGES.find(filterFunc) as TuplifyUnion<FilteredPage>[0];
-}
 export type AllSources = GetAliases<typeof PAGES>;

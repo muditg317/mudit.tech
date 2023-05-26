@@ -1,32 +1,34 @@
 
 import type {InvalidPageAlias,     Page,     PageConst    } from "./pages";
 import type {InvalidRedirectAlias, Redirect, RedirectConst} from './redirects';
-import {PAGES,     excluding as pagesExcluding,     where as pageWhere    } from "./pages";
-import {REDIRECTS, excluding as redirectsExcluding, where as redirectWhere} from "./redirects";
-import type {EntryTypeUnion, GetTitles, ValidatedList} from "./types";
+import {PAGES,     } from "./pages";
+import {REDIRECTS, } from "./redirects";
+import type {EntryTypeUnion, ValidatedList} from "./types";
 // import {typeCheckFn} from "./types";
 import type { ElementOf, Permutations, ReadonlyTuplifyUnion } from "~/utils/types";
+import { filterFuncsFor } from "../manipulators";
 
 export {isEntryType} from './types';
 
-export {redirectsExcluding, pagesExcluding};
+// export {redirectsExcluding, pagesExcluding};
 const allEntries = [...PAGES, ...REDIRECTS] as const;
 allEntries satisfies ValidatedList<typeof allEntries, EntryTypeUnion, InvalidRedirectAlias&InvalidPageAlias>;
 // typeCheckFn<typeof allEntries, EntryTypeUnion, InvalidRedirectAlias&InvalidPageAlias>(allEntries);
 
 export {PAGES, REDIRECTS};
-export {pageWhere, redirectWhere};
+// export {pageWhere, redirectWhere};
 
 export type {Redirect, Page};
-export function page<T extends GetTitles<typeof PAGES, Page>>(pageTitle: T) {
-  return pageWhere('title', pageTitle);
-}
-export const MAIN_PAGE = pageWhere('isMainPage', true);
+
+const pageFilter = filterFuncsFor(PAGES);
+const redirectFilter = filterFuncsFor(REDIRECTS);
+export {pageFilter, redirectFilter};
+
+export const page = pageFilter.firstWith.byField('title');
+export const redirect = redirectFilter.firstWith.byField('title');
+export const MAIN_PAGE = pageFilter.firstWith('isMainPage', true);
 export const defaultPage = MAIN_PAGE;
 
-export function redirect<T extends GetTitles<typeof REDIRECTS, Redirect>>(redirectTitle: T) {
-  return redirectWhere('title', redirectTitle);
-}
 
 export function filtered<Const extends EntryTypeUnion, F extends keyof Const, V extends Const[F], L extends ReadonlyArray<Const> = ReadonlyArray<Const>>(entries: readonly [...L], flagName: F, value: V) {
   type FilteredEntry = Extract<ElementOf<L>, {[K in F]: V}>;
@@ -65,6 +67,7 @@ export const navEntries = [...navPages, ...navRedirects] as const;
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const redirectHub = page('Redirect Hub');
+// const foo = redirectHub('title','About This Site');
 export const Page_RedirectHub = {
   ...redirectHub,
   pathname: redirectHub.aliases[0],

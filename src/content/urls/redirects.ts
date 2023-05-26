@@ -1,6 +1,7 @@
-import type {ElementOf, ReadonlyTuplifyUnion, TuplifyUnion} from '~/utils/types';
-import type { EmptyString, GetAliases, MultiWord, UrlEntry, ValidatedList } from './types';
+import type {ElementOf} from '~/utils/types';
+import type { EmptyString, GetAliases, MultiWord, UrlEntry } from './types';
 import { EntryType } from './types';
+import type { ValidateListField } from '../manipulators';
 
 export type InvalidRedirectAlias = MultiWord|EmptyString;
 
@@ -70,26 +71,10 @@ export const REDIRECTS = [
     entryType: EntryType.Redirect,
   }),
 ] as const;
-REDIRECTS satisfies ValidatedList<typeof REDIRECTS, Redirect, InvalidRedirectAlias>;
+REDIRECTS satisfies ValidateListField<Redirect, 'aliases', typeof REDIRECTS, 'no duplicates', InvalidRedirectAlias>;
+// REDIRECTS satisfies ValidatedList<typeof REDIRECTS, Redirect, InvalidRedirectAlias>;
 // typeCheckFn<typeof REDIRECTS, Redirect, InvalidRedirectAlias>(REDIRECTS);
 
 export type ConstRedirects = typeof REDIRECTS;
 export type RedirectConst = ElementOf<ConstRedirects>;
-export function excluding<F extends keyof RedirectConst, V extends RedirectConst[F]|undefined>(flagName: F, value: V) {
-  type FilteredRedirect = Exclude<RedirectConst, {[K in F]: V}>;
-  function filterFunc(redir: RedirectConst): redir is FilteredRedirect {
-    return redir[flagName] !== value;
-  }
-  const filteredRedirects = REDIRECTS.filter(filterFunc);
-  return filteredRedirects as ReadonlyTuplifyUnion<FilteredRedirect>;
-  // return arrayAsReadonly(filteredRedirects as TuplifyUnion<ElementOf<typeof filteredRedirects>>);
-}
-export function where<F extends keyof RedirectConst, V extends RedirectConst[F]>(flagName: F, value: V) {
-  type FilteredRedirect = Extract<RedirectConst, {[K in F]: V}>;
-  function filterFunc(redir: RedirectConst): redir is FilteredRedirect {
-    return redir[flagName] === value;
-  }
-  return REDIRECTS.find(filterFunc) as TuplifyUnion<FilteredRedirect>[0];
-}
-
 export type AllSources = GetAliases<typeof REDIRECTS>;
