@@ -19,7 +19,7 @@ export default function NavBar<EntryType extends NavBarEntry>({ entries, isActiv
   return (
     <motion.div layout layoutRoot
         transition={{ duration: 3 }}
-        className="w-full min-h-full h-full flex flex-col justify-start items-center">
+        className="flex flex-col items-center justify-start w-full h-full min-h-full">
       <LayoutGroup>
         <NavGroupDivider name="div-top" heightClass={`${activeIndex > 0 ? "h-0" : "h-full"} mb-2`} />
         {entries.map((item, index) => {

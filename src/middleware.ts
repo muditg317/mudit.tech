@@ -26,29 +26,34 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirection.target);
   } else if (redirectionMatch?.[4]) { // there is a redirection request with some target
     console.log(`Unknown redirection @ [${pathname}] -- [${redirectionMatch[4]}] - checking database...`);
-    // TODO: fetch redirections from database
-    // const desiredRedirect = null as Partial<Redirect> | null;
-    const desiredRedirect = await prisma.redirection.findFirst({
-      where: {
-        aliases: {
-          contains: `||${redirectionMatch[4]}||`
-        }
-      },
-      select: {
-        title: true,
-        target: true,
-      }
-    });
-    // console.log('DB result:', desiredRedirect);
-    if (desiredRedirect) { // the reqirection request is found in the database
-      console.log(`redirect from [${pathname}] to [${desiredRedirect.title}](${desiredRedirect.target})`);
-      return NextResponse.redirect(desiredRedirect.target);
-    }
     
-    console.log(`Return to Redirect Hub @ [${Page_RedirectHub.pathname}]`);
-    const target = new URL(`/${Page_RedirectHub.pathname}`, request.url);
-    target.searchParams.set('from', redirectionMatch[4]);
-    return NextResponse.redirect(target);
+    try {
+      const desiredRedirect = await prisma.redirection.findFirst({
+        where: {
+          aliases: {
+            contains: `||${redirectionMatch[4]}||`
+          }
+        },
+        select: {
+          title: true,
+          target: true,
+        }
+      });
+      // console.log('DB result:', desiredRedirect);
+      if (desiredRedirect) { // the reqirection request is found in the database
+        console.log(`redirect from [${pathname}] to [${desiredRedirect.title}](${desiredRedirect.target})`);
+        return NextResponse.redirect(desiredRedirect.target);
+      }
+      
+      console.log(`Return to Redirect Hub @ [${Page_RedirectHub.pathname}]`);
+      const target = new URL(`/${Page_RedirectHub.pathname}`, request.url);
+      target.searchParams.set('from', redirectionMatch[4]);
+      return NextResponse.redirect(target);
+    } catch (err) {
+      console.error('Error while searching for redirection in database:', err);
+      console.log(`Return to Redirect Hub @ [${Page_RedirectHub.pathname}]`);
+      return NextResponse.redirect(new URL(`/${Page_RedirectHub.pathname}`, request.url));
+    }
   } else if (redirectionMatch) { // there is a redirection request but no target
     console.log(`Broken redirection @ [${pathname}] -- [${redirectionMatch.toString()}]`);
     if (pathname === Page_RedirectHub.pathname) { // already pointed at hub
@@ -72,4 +77,4 @@ export const config = {
      */
     '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
-}
+};

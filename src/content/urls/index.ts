@@ -5,7 +5,7 @@ import {PAGES,     excluding as pagesExcluding,     where as pageWhere    } from
 import {REDIRECTS, excluding as redirectsExcluding, where as redirectWhere} from "./redirects";
 import type {EntryTypeUnion, GetTitles, ValidatedList} from "./types";
 // import {typeCheckFn} from "./types";
-import type { TuplifyUnion, ElementOf, Permutations } from "~/utils/types";
+import type { ElementOf, Permutations, ReadonlyTuplifyUnion } from "~/utils/types";
 
 export {isEntryType} from './types';
 
@@ -34,7 +34,7 @@ export function filtered<Const extends EntryTypeUnion, F extends keyof Const, V 
     return entry[flagName] === value;
   }
   const filteredEntries = entries.filter(filterFunc);
-  return filteredEntries as Readonly<TuplifyUnion<FilteredEntry>>;
+  return filteredEntries as ReadonlyTuplifyUnion<FilteredEntry>;
 }
 export function filteredPages<F extends keyof PageConst, V extends PageConst[F]>(flagName: F, value: V) {
   return filtered<PageConst, F, V>(PAGES, flagName, value);

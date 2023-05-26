@@ -37,6 +37,7 @@ export type UrlEntry<D extends Partial<BaseUrlEntry>=NonNullable<unknown>> = Rea
 
 export type GetAliases<UrlEntries extends ReadonlyArray<T>, T extends UrlEntry = UrlEntry> = UrlEntries[IndicesOf<UrlEntries>]['aliases'][number];
 export type GetTitles<UrlEntries extends ReadonlyArray<T>, T extends UrlEntry = UrlEntry> = UrlEntries[IndicesOf<UrlEntries>]['title'];
+export type GetArrayFieldValues<Entry extends ReadonlyArray<T>, F extends string, T extends { [K in F]: ReadonlyArray<unknown> }> = Entry[IndicesOf<Entry>][F][number];
 
 type InterfaceFollowingList<AllAliases extends string, InvalidAliases, T extends UrlEntry> = [AllAliases] extends [ExtractWords<AllAliases, InvalidAliases>] ? Record<number, T> : Record<number, {aliases: Aliases<AllAliases>}>;
 type AliasUnions<UrlEntries extends ReadonlyArray<T>, T extends UrlEntry> = { [I in IndicesOf<UrlEntries>]: ElementOf<UrlEntries[I]['aliases']> };

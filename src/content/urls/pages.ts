@@ -1,4 +1,4 @@
-import type {ElementOf, TuplifyUnion} from '~/utils/types';
+import type {ElementOf, ReadonlyTuplifyUnion, TuplifyUnion} from '~/utils/types';
 import type { GetAliases, MultiWord, UrlEntry, ValidatedList } from './types';
 import {EntryType} from './types';
 
@@ -70,7 +70,7 @@ export function excluding<F extends keyof PageConst, V extends PageConst[F]>(fla
     return page[flagName] !== value;
   }
   const filteredPages = PAGES.filter(filterFunc);
-  return filteredPages as Readonly<TuplifyUnion<FilteredPage>>;
+  return filteredPages as ReadonlyTuplifyUnion<FilteredPage>;
   // return arrayAsReadonly(filteredPages as TuplifyUnion<ElementOf<typeof filteredPages>>);
 }
 export function where<F extends keyof PageConst, V extends PageConst[F]>(flagName: F, value: V) {

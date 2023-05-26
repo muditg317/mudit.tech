@@ -25,7 +25,7 @@ const About: NextPage = () => {
                   exit={{ opacity: 0, x: -100, transition: {duration: 3} }}
                   key="red"
                   transition={{ type: 'linear', duration: 1 }}
-                  className="h-16 w-16 bg-red-500"
+                  className="w-16 h-16 bg-red-500"
                 />)
               : (<motion.div
                   initial={{ opacity: 0, y: 100 }}
@@ -33,12 +33,12 @@ const About: NextPage = () => {
                   exit={{ opacity: 0, y: -100, transition: {duration: 1} }}
                   key="blue"
                   transition={{ type: 'linear', duration: 3 }}
-                  className="h-16 w-16 bg-blue-500"
+                  className="w-16 h-16 bg-blue-500"
                 />)
             }
           </div>
         </AnimatePresence>
-        <button onClick={() => setShow(s=>!s)} className="w-max h-12 bg-green-700">Toggle</button> */}
+        <button onClick={() => setShow(s=>!s)} className="h-12 bg-green-700 w-max">Toggle</button> */}
         {new Array(10).fill(0).map((_, index) => (
           <h1 key={index} data-nav-tab={`${index}`} className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
             About {index}<br />--foo foo {index} foo <br />--foo foo {index} foo <br />--foo foo {index} foo 

@@ -30,8 +30,15 @@ export type IndicesOf<T extends ArrayLike<unknown>> =
     keyof T extends 'length' ? never : // T only has length but no indices
     keyof T; // cannot get actual indices -> any key of T
 
+/** Length of the given tuple */
+export type LengthOf<T> =
+    T extends {length: infer L} ? L : // has length -> that number
+    [] extends T ? 0 : // empty list
+    T extends unknown[] | readonly unknown[] ? T['length'] : // extract numeric indices up to length 44 (index 43)
+    never; // cannot get actual length
+
 /** Used internally by AsReadonlyArr - get keys excluding indices and length */
-type ReadonlyArrayMethods = Omit<readonly unknown[], number|'length'>;
+export type ReadonlyArrayMethods<T=unknown> = Omit<readonly T[], number|'length'>;
 
 /** Convert a record of number to item to a readonly array of those items */
 export type AsReadonlyArr<Items extends Record<number, unknown>, Length> = Items & ReadonlyArrayMethods & {length: Length};
@@ -71,6 +78,8 @@ type TuplifyUnionHelper<
 
 /** Convert union type to tuple by repeatedly extracting last item */
 export type TuplifyUnion<T> = TuplifyUnionHelper<T>;
+
+export type ReadonlyTuplifyUnion<T> = Readonly<TuplifyUnion<T>>;
 
 /** Get all value types from object type - (key,value) pairs */
 export type ValueOf<T extends Record<string|number|symbol, unknown>> = T extends Record<infer K, unknown> ? T[K] : never;
@@ -116,4 +125,5 @@ export type ZipTuple<T extends readonly unknown[], U extends readonly unknown[]>
     [K in keyof T]: [T[K], K extends keyof U ? U[K] : never]
   }
 
+/** Get the exact entries of an object if possible */
 export type ExactEntries<Obj extends object> = ZipTuple<TuplifyUnion<keyof Obj>, TuplifyUnion<Obj[keyof Obj]>>;

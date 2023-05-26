@@ -125,18 +125,18 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
       >
       {/* <Palette /> used for KBar */}
       <header className="">
-        <nav className="w-max pl-4 fixed left-0 h-full z-50 hidden lg:block md:block">
+        <nav className="fixed left-0 z-50 hidden h-full pl-4 w-max lg:block md:block">
           <NavBar<PageConst>
             entries={navEntries}
             isActiveTab={navTabIsActiveCb}
             onTabClick={navTabClickCb}
           />
         </nav>
-        <nav className="fixed top-0 w-full z-50 block lg:hidden md:hidden px-8 pt-4">
+        <nav className="fixed top-0 z-50 block w-full px-8 pt-4 lg:hidden md:hidden">
           {/* <MobileNavBar path={currentRoute} /> */}
         </nav>
       </header>
-      <main className="w-full min-h-screen h-full flex flex-col items-center">
+      <main className="flex flex-col items-center w-full h-full min-h-screen">
         <AnimatePresence
             mode="sync"
             initial={false}
@@ -146,7 +146,7 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
             custom={pageAnimCustom.current}
         >
           <motion.section
-              className="flex flex-col w-full justify-between mt-16 lg:mt-0 md:mt-0 prose"
+              className="flex flex-col justify-between w-full mt-16 prose lg:mt-0 md:mt-0"
               data-page-name={currentRoute}
               key={activeTab}
               initial="screenXEnter-enter"

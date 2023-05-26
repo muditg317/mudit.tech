@@ -37,7 +37,7 @@ const Home: NextPage = () => {
               {project.title}
             </h1>
             {/* </Link> */}
-            <p className="text-2xl text-white w-2/3">
+            <p className="w-2/3 text-2xl text-white">
               {project.description}
             </p>
           </div>
@@ -59,12 +59,12 @@ const AuthShowcase: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center gap-4">
-      <p className="text-center text-2xl text-white">
+      <p className="text-2xl text-center text-white">
         {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
         {secretMessage && <span> - {secretMessage}</span>}
       </p>
       <button
-        className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
+        className="px-10 py-3 font-semibold text-white no-underline transition rounded-full bg-white/10 hover:bg-white/20"
         onClick={sessionData ? () => void signOut() : () => void signIn()}
       >
         {sessionData ? "Sign out" : "Sign in"}
