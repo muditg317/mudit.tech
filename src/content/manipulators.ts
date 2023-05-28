@@ -1,4 +1,4 @@
-import { readonlyFilter } from "~/utils/type-modifiers";
+import { readonlyFilter, readonlyFind } from "~/utils/type-modifiers";
 import type { ElementOf, IndicesOf, TuplifyUnion } from "~/utils/types";
 
 type C_<$T extends {c:unknown}> = $T['c'];
@@ -9,7 +9,7 @@ type Transformer = { c: unknown, f: unknown, v: unknown, type: unknown };
 type apply_$T<$T extends Transformer, C, F, V> = ($T & {c:C,f:F,v:V})['type'];
 
 type FieldValidator = { c: unknown, type: unknown };
-type apply_$FV<$FV extends FieldValidator, C> = keyof C & ($FV & {c:C})['type'];
+// type apply_$FV<$FV extends FieldValidator, C> = keyof C & ($FV & {c:C})['type'];
 
 function withField<
   $transformer extends Transformer,
@@ -29,7 +29,7 @@ function withData<
 >(func: Fn) {
   return function withData<const C>(data: ReadonlyArray<C>) {
     function funcOnData<const F extends keyof C, const V extends C[F]>(flagName: F, value: V) {
-      return func(data, flagName, value);// as apply_$T<$transformer, C, F, V>;
+      return func(data, flagName, value) as apply_$T<$transformer, C, F, V>;
     }
     return withField<$transformer, C, typeof funcOnData>(funcOnData);
   }
@@ -55,15 +55,15 @@ function filterFor<const C>(data: ReadonlyArray<C>) {
 }
 
 
-interface $FV_firstWithFromData extends FieldValidator {
-  type: NonArrayValuedKeys<C_<this>>
-}
-function firstWithFromData<const Const, const Field extends keyof Const, const Val extends Const[Field]>(data: ReadonlyArray<Const>, flagName: Field, value: Val) {
+// interface $FV_firstWithFromData extends FieldValidator {
+//   type: NonArrayValuedKeys<C_<this>>
+// }
+export function firstWithFromData<const Const, const Field extends keyof Const, const Val extends Const[Field]>(data: ReadonlyArray<Const>, flagName: Field, value: Val) {
   type FilteredItem = Extract<Const, {[K in Field]: Val}>;
   function filterFunc(item: Const): item is FilteredItem {
     return item[flagName] === value;
   }
-  return data.find(filterFunc) as TuplifyUnion<FilteredItem>[0];
+  return readonlyFind(data, filterFunc);//data.find(filterFunc) as TuplifyUnion<FilteredItem>[0];
 }
 interface $T_firstWithFromData extends Transformer {
   type: ReturnType<typeof firstWithFromData<
@@ -74,18 +74,17 @@ interface $T_firstWithFromData extends Transformer {
       ] ? V_<this> : never
   >>
 }
+// function firstWithFuncFor<const C>(data: ReadonlyArray<C>) {
+//   function where<F extends keyof C, V extends C[F]>(flagName: F, value: V) {
+//     return firstWithFromData(data, flagName, value);
+//   }
+//   return withField<$T_firstWithFromData, C, typeof where>(where);
+// }
 const genericFirstWith = withData<
   $T_firstWithFromData,
   // $FV_firstWithFromData,
   typeof firstWithFromData
 >(firstWithFromData);
-
-function firstWithFuncFor<const C>(data: ReadonlyArray<C>) {
-  function where<F extends keyof C, V extends C[F]>(flagName: F, value: V) {
-    return firstWithFromData(data, flagName, value);
-  }
-  return withField<$T_firstWithFromData, C, typeof where>(where);
-}
 
 
 function excludingFromData<const C, const F extends keyof C, const V extends C[F]>(data: ReadonlyArray<C>, flagName: F, value: V) {

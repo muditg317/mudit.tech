@@ -13,6 +13,14 @@ export function readonlyFilter<const Arr extends ReadonlyArray<unknown>, S exten
   return (array as ReadonlyArray<ElementOf<Arr>>).filter(filterFn) as ResultType;
 }
 
+export function readonlyFind<const Arr extends ReadonlyArray<unknown>, S extends ElementOf<Arr>, Filter extends (c:ElementOf<Arr>) => c is S>(array: Arr, filterFn: Filter) {
+  type ResultType =
+    Filter extends ((c:ElementOf<Arr>) => c is infer F extends ElementOf<Arr>)
+      ? ReadonlyArrayTupleOfConst<F>
+      : DistributedTuple2ArrayOfUnion<Arr>;
+  return (array as ReadonlyArray<ElementOf<Arr>>).find(filterFn) as ResultType[0];
+}
+
 export function exactEntries<const Obj extends object, OutType=ExactEntries<Obj>>(obj: Obj): OutType {
   return Object.entries(obj) as OutType;
 }

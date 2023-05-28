@@ -82,3 +82,4 @@ export const projectFilter = filterFuncsFor(PROJECTS);
 // type t3 = typeof exc[number]['title'];
 
 // const bad = projectFilter.firstWith('aliases', ['bokay']);
+// type t4 = typeof bad['title'];
